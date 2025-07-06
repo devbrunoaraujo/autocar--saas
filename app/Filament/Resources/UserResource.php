@@ -24,17 +24,25 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nome')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
+                    ->required(fn(string $operation): bool => $operation === 'create')//A função recebe a operação atual (create ou edit) e retorna true apenas se for uma operação de criação
+                    ->dehydrated(fn(?string $state) => filled($state)) //só atualiza a senha se o campo foi preenchido (evita sobrescrever com vazio ao editar)
+                    ->confirmed()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('password_confirmation')
+                    ->label('Confirmar senha')
+                    ->password()
+                    ->requiredWith('password') //só é obrigatório se o campo senha estiver preenchido
+                    ->dehydrated(false), //não armazena no estado, pois é apenas para validação
             ]);
     }
 
@@ -46,30 +54,26 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Criado em')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Atualizado em')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
