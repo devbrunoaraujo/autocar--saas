@@ -12,10 +12,19 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Closure;
 
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
+
+    protected static ?string $modelLabel = 'Cliente';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -32,31 +41,65 @@ class CustomerResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
+                    ->label('Telefone')
+                    ->required()
+                    ->mask('(99) 99999-9999')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address')
+                    ->required()
+                    ->label('Endereço')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('city')
+                    ->label('Cidade')
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('state')
+                    ->label('Estado')
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('zip_code')
+                    ->label('CEP')
+                    ->mask('99999-999')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('country')
+                    ->label('País')
                     ->required()
                     ->maxLength(255)
                     ->default('Brasil'),
+                Forms\Components\Select::make('document_type')
+                    ->options([
+                        'CPF' => 'CPF',
+                        'CNPJ' => 'CNPJ',
+                    ])
+                    ->label('Tipo de Documento')
+                    ->required()
+                    ->default('CPF')
+                    ->live(),
                 Forms\Components\TextInput::make('document')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('document_type')
+                    ->maxLength(18)
                     ->required()
                     ->maxLength(255)
-                    ->default('CPF'),
+                    ->default('CPF')
+                    ->mask(fn (Get $get) => match($get('document_type')) { //função para definir a máscara dinamicamente
+                        'CPF' => '999.999.999-99',
+                        'CNPJ' => '99.999.999/9999-99',
+                        default => null,
+                    })
+                    ->placeholder(fn (Get $get) => match($get('document_type')) { //função para definir o placeholder dinamicamente
+                        'CPF' => '000.000.000-00',
+                        'CNPJ' => '00.000.000/0000-00',
+                        default => 'Selecione o tipo de documento'
+                    }),
+                DatePicker::make('date_of_birth')
+                    ->label('Data de Nascimento')
+                    ->required(),
                 Forms\Components\Toggle::make('is_active')
                     ->required(),
                 Forms\Components\Toggle::make('is_verified')
                     ->required(),
                 Forms\Components\DateTimePicker::make('verified_at'),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
