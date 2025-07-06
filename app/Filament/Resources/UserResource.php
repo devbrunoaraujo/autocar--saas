@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Fieldset;
 
 class UserResource extends Resource
 {
@@ -22,27 +23,42 @@ class UserResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Nome')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->required(fn(string $operation): bool => $operation === 'create')//A função recebe a operação atual (create ou edit) e retorna true apenas se for uma operação de criação
-                    ->dehydrated(fn(?string $state) => filled($state)) //só atualiza a senha se o campo foi preenchido (evita sobrescrever com vazio ao editar)
-                    ->confirmed()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('password_confirmation')
-                    ->label('Confirmar senha')
-                    ->password()
-                    ->requiredWith('password') //só é obrigatório se o campo senha estiver preenchido
-                    ->dehydrated(false), //não armazena no estado, pois é apenas para validação
+                Fieldset::make('Dados do Usuário')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nome')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('password')
+                            ->label('Senha')
+                            ->password()
+                            ->required()
+                            ->required(fn(string $operation): bool => $operation === 'create') //A função recebe a operação atual (create ou edit) e retorna true apenas se for uma operação de criação
+                            ->dehydrated(fn(?string $state) => filled($state)) //só atualiza a senha se o campo foi preenchido (evita sobrescrever com vazio ao editar)
+                            ->confirmed()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('password_confirmation')
+                            ->label('Confirmar senha')
+                            ->password()
+                            ->requiredWith('password') //só é obrigatório se o campo senha estiver preenchido
+                            ->dehydrated(false), //não armazena no estado, pois é apenas para validação
+                        Forms\Components\Select::make('roles')
+                            ->label('Cargo')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->required()
+                            ->searchable()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => __('roles.' . $record->name, ['default' => $record->name])),
+                    ])
+                    ->columns(1)
+
             ]);
     }
 
