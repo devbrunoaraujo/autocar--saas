@@ -280,6 +280,7 @@ class VehicleResource extends Resource
                         FileUpload::make('thumbnail')
                             ->label('Thumb')
                             ->image()
+                            ->imageEditor()
                             ->disk('public')
                             ->directory('vehicles/thumbnail')
                             ->preserveFilenames()
