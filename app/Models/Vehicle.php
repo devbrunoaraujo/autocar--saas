@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Contracts\Image\ImageProcessorInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -122,5 +124,10 @@ class Vehicle extends Model
     public function getFullNameAttribute()
     {
         return "{$this->brand_name} {$this->model_name} {$this->year_name}";
+    }
+
+    public function Optionals(): BelongsToMany
+    {
+        return $this->belongsToMany(Optional::class);
     }
 }
