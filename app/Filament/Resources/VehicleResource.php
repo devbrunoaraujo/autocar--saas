@@ -3,14 +3,19 @@
 namespace App\Filament\Resources;
 
 use App\Contracts\FipeServiceInterface;
+use App\Contracts\ImageProcessorInterface;
 use App\Filament\Resources\VehicleResource\Pages;
 use App\Models\Vehicle;
+use App\Services\ImageUploadService;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+//use Illuminate\Container\Attributes\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Resource do Filament para gerenciar veículos
@@ -229,12 +234,118 @@ class VehicleResource extends Resource
                             ->disabled()
                             ->dehydrated(false),
 
-                        Forms\Components\TextInput::make('month_reference')
-                            ->label('Mês de Referência')
-                            ->disabled()
-                            ->dehydrated(false),
                     ])
-                    ->columns(3),
+                    ->columns(2),
+
+                Forms\Components\Section::make('Detalhes do Veículo')
+                    ->description('Informações complementares do veículo')
+                    ->schema([
+                        Forms\Components\TextInput::make('license_plate')
+                            ->label('Placa')
+                            ->mask('*******'),
+                        Forms\Components\TextInput::make('color')
+                            ->label('Cor'),
+                        Forms\Components\Select::make('transmission')
+                            ->label('Transmissão')
+                            ->options([
+                                'Manual' => 'Manual',
+                                'Automático' => 'Automático',
+                            ]),
+
+                        Forms\Components\TextInput::make('mileage')
+                            ->label('Quilometragem')
+                            ->numeric(),
+                        Forms\Components\TextInput::make('renavam')
+                            ->label('RENAVAM')
+                            ->numeric(),
+                        Forms\Components\TextInput::make('crv')
+                            ->label('CRV')
+                            ->numeric(),
+                        Forms\Components\TextInput::make('chassis_number')
+                            ->label('Chassi'),
+                        Forms\Components\Textarea::make('notes')
+                            ->label('Observações'),
+                    ])
+                    ->columns(2),
+
+                Forms\Components\Section::make('Status e Mídia')
+                    ->description('Status e imagens do veículo')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Ativo'),
+
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Destaque'),
+
+                        FileUpload::make('thumbnail')
+                            ->label('Thumb')
+                            ->image()
+                            ->disk('public')
+                            ->directory('vehicles/thumbnail')
+                            ->preserveFilenames()
+                            ->visibility('public')
+                            ->imagePreviewHeight('150')
+                            ->saveUploadedFileUsing(function ($file) {
+                                return ImageUploadService::saveWithWebp(
+                                    file: $file,
+                                    dir: 'vehicles/thumbnail',
+                                    width: 640,
+                                    quality: 80,
+                                    disk: 'public'
+                                );
+                            })
+                            ->deleteUploadedFileUsing(function ($file) {
+                                Storage::disk('public')->delete($file);
+                            }),
+
+                        Forms\Components\FileUpload::make('gallery')
+                            ->label('Imagens do veículo')
+                            ->multiple()
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->directory('vehicles/gallery')
+                            ->imagePreviewHeight('150')
+                            ->maxSize(2048)
+                            ->helperText('Você pode enviar múltiplas imagens do carro.')
+                            ->reorderable()
+                            ->preserveFilenames()
+                            ->disk('public')
+                            ->visibility('public')
+                            ->saveUploadedFileUsing(function ($file) {
+                                return ImageUploadService::saveWithWebp(
+                                    file: $file,
+                                    dir: 'vehicles/gallery',
+                                    width: 1280,
+                                    quality: 75,
+                                    disk: 'public'
+                                );
+                            })
+                            ->deleteUploadedFileUsing(function ($file) {
+                                Storage::disk('public')->delete($file);
+                            }),
+
+                    ])
+                    ->columns(2),
+
+                Forms\Components\Section::make('Valores de Compra e Venda')
+                    ->description('Preços de compra e venda do veículo')
+                    ->schema([
+                        Forms\Components\TextInput::make('purchase_price')
+                            ->label('Preço de Compra')
+                            ->numeric()
+                            ->prefix('R$'),
+                        Forms\Components\TextInput::make('sale_price')
+                            ->label('Preço de Venda')
+                            ->numeric()
+                            ->prefix('R$'),
+                    ])
+                    ->columns(2),
 
                 // Campos ocultos para armazenar os dados
                 Forms\Components\Hidden::make('brand_name'),

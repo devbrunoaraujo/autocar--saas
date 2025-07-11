@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Contracts\Image\ImageProcessorInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Model para representar um veículo
@@ -29,6 +31,20 @@ class Vehicle extends Model
         'fuel_acronym',
         'fipe_price',
         'month_reference',
+        'purchase_price',
+        'sale_price',
+        'color',
+        'transmission',
+        'mileage',
+        'renavam',
+        'crv',
+        'chassis_number',
+        'license_plate',
+        'notes',
+        'is_active',
+        'is_featured',
+        'thumbnail',
+        'gallery',
     ];
 
     /**
@@ -37,11 +53,38 @@ class Vehicle extends Model
     protected $casts = [
         'brand_id' => 'integer',
         'model_id' => 'integer',
+        'purchase_price' => 'float',
+        'sale_price' => 'float',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+        'gallery' => 'array',
     ];
 
-    /**
+
+    protected static function booted()
+    {
+
+        static::saving(function ($car) {
+            if (! $car->is_active) {
+                $car->is_featured = false;
+            }
+        });
+
+        static::deleting(function ($vehicle) {
+            if ($vehicle->thumbnail) {
+                Storage::disk('public')->delete($vehicle->thumbnail);
+            }
+            if (is_array($vehicle->gallery)) {
+                foreach ($vehicle as $image) {
+                    Storage::disk('public')->delete($image);
+                }
+            }
+        });
+    }
+     /**
      * Scope para filtrar por tipo de veículo
      */
     public function scopeByVehicleType($query, $vehicleType)

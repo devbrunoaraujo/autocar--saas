@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Contracts\FipeServiceInterface;
+use App\Contracts\ImageProcessorInterface;
 use App\Services\FipeService;
+use App\Services\ImageProcessorService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -14,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(FipeServiceInterface::class, FipeService::class);
+
     }
 
     /**
