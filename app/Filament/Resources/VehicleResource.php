@@ -7,6 +7,7 @@ use App\Contracts\ImageProcessorInterface;
 use App\Filament\Resources\VehicleResource\Pages;
 use App\Models\Vehicle;
 use App\Services\ImageUploadService;
+use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
@@ -448,6 +449,21 @@ class VehicleResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Action::make('add_to_inventory')
+                ->label('Adicionar ao Estoque')
+                ->icon('heroicon-o-plus-circle')
+                ->action(function ($record) {
+                    \App\Models\Inventory::create([
+                        'vehicle_id' => $record->id,
+                        'entry_date' => now(),
+                        'entry_type' => 'compra', // ou outro valor conforme sua lógica
+                        // preencha outros campos conforme necessário
+                    ]);
+                })
+                ->requiresConfirmation()
+                ->color('success')
+                ->visible(fn($record) => $record->inventories()->count() === 0) // só exibe se não houver inventários
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
