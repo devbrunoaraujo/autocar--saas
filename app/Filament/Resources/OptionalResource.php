@@ -21,6 +21,8 @@ class OptionalResource extends Resource
 
     protected static ?string $modelLabel = 'Opcionais';
 
+    protected static ?string $navigationGroup = 'Veículos';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -29,7 +31,6 @@ class OptionalResource extends Resource
                     ->label('Nome')
                     ->required()
                     ->maxLength(255)
-                    ->unique(ignoreRecord: true),
             ]);
     }
 
@@ -37,7 +38,22 @@ class OptionalResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nome')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Criado em')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Atualizado em')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 //

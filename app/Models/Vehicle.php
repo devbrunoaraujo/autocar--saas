@@ -2,25 +2,15 @@
 
 namespace App\Models;
 
-use App\Contracts\Image\ImageProcessorInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * Model para representar um veículo
- *
- * Este model armazena as informações dos veículos consultados na API da FIPE
- */
 class Vehicle extends Model
 {
     use HasFactory;
 
-    /**
-     * Campos que podem ser preenchidos em massa
-     */
     protected $fillable = [
         'vehicle_type',
         'brand_id',
@@ -49,9 +39,6 @@ class Vehicle extends Model
         'gallery',
     ];
 
-    /**
-     * Conversões de tipo para os atributos
-     */
     protected $casts = [
         'brand_id' => 'integer',
         'model_id' => 'integer',
@@ -65,69 +52,68 @@ class Vehicle extends Model
         'gallery' => 'array',
     ];
 
-
     protected static function booted()
     {
-
-        static::saving(function ($car) {
-            if (! $car->is_active) {
-                $car->is_featured = false;
+        static::saving(function ($vehicle) {
+            if (!$vehicle->is_active) {
+                $vehicle->is_featured = false;
             }
         });
 
         static::deleting(function ($vehicle) {
-            if ($vehicle->thumbnail) {
+            // Deleta thumbnail se existir
+            if (!empty($vehicle->thumbnail)) {
                 Storage::disk('public')->delete($vehicle->thumbnail);
             }
-            if (is_array($vehicle->gallery)) {
-                foreach ($vehicle as $image) {
-                    Storage::disk('public')->delete($image);
+            // Deleta imagens da galeria se existir
+            if (!empty($vehicle->gallery)) {
+                $gallery = is_array($vehicle->gallery) ? $vehicle->gallery : json_decode($vehicle->gallery, true);
+                if (is_array($gallery)) {
+                    foreach ($gallery as $image) {
+                        if (!empty($image)) {
+                            Storage::disk('public')->delete($image);
+                        }
+                    }
                 }
             }
         });
     }
-     /**
-     * Scope para filtrar por tipo de veículo
-     */
+
+    // Scopes
     public function scopeByVehicleType($query, $vehicleType)
     {
         return $query->where('vehicle_type', $vehicleType);
     }
 
-    /**
-     * Scope para filtrar por marca
-     */
     public function scopeByBrand($query, $brandId)
     {
         return $query->where('brand_id', $brandId);
     }
 
-    /**
-     * Scope para filtrar por modelo
-     */
     public function scopeByModel($query, $modelId)
     {
         return $query->where('model_id', $modelId);
     }
 
-    /**
-     * Accessor para formatar o preço FIPE
-     */
+    // Accessors
     public function getFormattedFipePriceAttribute()
     {
         return $this->fipe_price ? "R$ {$this->fipe_price}" : null;
     }
 
-    /**
-     * Accessor para nome completo do veículo
-     */
     public function getFullNameAttribute()
     {
         return "{$this->brand_name} {$this->model_name} {$this->year_name}";
     }
 
-    public function Optionals(): BelongsToMany
+    // Relationships
+    public function optionals(): BelongsToMany
     {
-        return $this->belongsToMany(Optional::class);
+        return $this->belongsToMany(
+            Optional::class,
+            'vehicle_optionals',
+            'vehicle_id',
+            'optionals_id'
+        );
     }
 }

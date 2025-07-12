@@ -333,6 +333,17 @@ class VehicleResource extends Resource
 
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('Opcionais')
+                    ->description('Selecione os opcionais do veículo')
+                    ->schema([
+                        Forms\Components\CheckboxList::make('optionals')
+                            ->label('Opcionais')
+                            ->columns(4)
+                            ->relationship('optionals', 'name')
+                            ->searchable()
+                            ->bulktoggleable()
+                    ])
+                    ->columns(1),
 
                 Forms\Components\Section::make('Valores de Compra e Venda')
                     ->description('Preços de compra e venda do veículo')
