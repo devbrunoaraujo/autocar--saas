@@ -135,7 +135,7 @@ class InventoryResource extends Resource
     {
         return [
             'index' => Pages\ListInventories::route('/'),
-            'view' => Pages\ViewInventory::route('/{record}'),
+            //'view' => Pages\ViewInventory::route('/{record}'),
             //'create' => Pages\CreateInventory::route('/create'),
             //'edit' => Pages\EditInventory::route('/{record}/edit'),
 
