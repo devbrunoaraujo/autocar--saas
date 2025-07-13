@@ -116,7 +116,7 @@ class InventoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                //Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -135,8 +135,10 @@ class InventoryResource extends Resource
     {
         return [
             'index' => Pages\ListInventories::route('/'),
-            'create' => Pages\CreateInventory::route('/create'),
-            'edit' => Pages\EditInventory::route('/{record}/edit'),
+            'view' => Pages\ViewInventory::route('/{record}'),
+            //'create' => Pages\CreateInventory::route('/create'),
+            //'edit' => Pages\EditInventory::route('/{record}/edit'),
+
         ];
     }
 }

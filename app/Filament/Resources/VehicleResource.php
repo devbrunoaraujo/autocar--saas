@@ -411,8 +411,6 @@ class VehicleResource extends Resource
                     ->label('Ano')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('fuel')
-                    ->label('Combustível'),
 
                 Tables\Columns\TextColumn::make('fipe_price')
                     ->label('Preço FIPE')
@@ -452,19 +450,32 @@ class VehicleResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Action::make('add_to_inventory')
-                ->label('Adicionar ao Estoque')
-                ->icon('heroicon-o-plus-circle')
-                ->action(function ($record) {
-                    \App\Models\Inventory::create([
-                        'vehicle_id' => $record->id,
-                        'entry_date' => now(),
-                        'entry_type' => 'compra', // ou outro valor conforme sua lógica
-                        // preencha outros campos conforme necessário
-                    ]);
-                })
-                ->requiresConfirmation()
-                ->color('success')
-                ->visible(fn($record) => $record->inventories()->count() === 0) // só exibe se não houver inventários
+                    ->label('Adicionar ao Estoque')
+                    ->icon('heroicon-o-plus-circle')
+                    ->form([
+                        Forms\Components\Select::make('entry_type')
+                            ->label('Tipo de Entrada')
+                            ->options([
+                                'compra' => 'Compra',
+                                'troca' => 'Troca',
+                                'transferencia' => 'Transferência',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
+                        if ($record->inventories()->exists()) {
+                            throw new \Exception('Este veículo já está no estoque!');
+                        }
+                        \App\Models\Inventory::create([
+                            'vehicle_id' => $record->id,
+                            'entry_date' => now(),
+                            'entry_type' => $data['entry_type'],
+                            'total_cost' => $record->purchase_price,
+                        ]);
+                    })
+                    ->requiresConfirmation()
+                    ->color('success')
+                    ->visible(fn($record) => $record->inventories()->count() === 0)
 
             ])
             ->bulkActions([
