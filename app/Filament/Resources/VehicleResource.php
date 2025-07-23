@@ -5,12 +5,14 @@ namespace App\Filament\Resources;
 use App\Contracts\FipeServiceInterface;
 use App\Contracts\ImageProcessorInterface;
 use App\Filament\Resources\VehicleResource\Pages;
+use App\Models\Inventory;
 use App\Models\Vehicle;
 use App\Services\ImageUploadService;
 use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -466,12 +468,16 @@ class VehicleResource extends Resource
                         if ($record->inventories()->exists()) {
                             throw new \Exception('Este veículo já está no estoque!');
                         }
-                        \App\Models\Inventory::create([
+                        Inventory::create([
                             'vehicle_id' => $record->id,
                             'entry_date' => now(),
                             'entry_type' => $data['entry_type'],
                             'total_cost' => $record->purchase_price,
                         ]);
+                        Notification::make()
+                            ->title('Veículo adicionado ao estoque com sucesso!')
+                            ->success()
+                            ->send();
                     })
                     ->requiresConfirmation()
                     ->color('success')

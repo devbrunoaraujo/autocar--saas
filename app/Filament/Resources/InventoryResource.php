@@ -5,11 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Vehicle;
+use Filament\Tables\Actions\Action;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+
 
 class InventoryResource extends Resource
 {
@@ -118,6 +122,36 @@ class InventoryResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 //Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Action::make('inventory_exit')
+                    ->label('Registrar Saída')
+                    ->icon('heroicon-o-arrow-right')
+                    ->form([
+                        Select::make('exit_type')
+                            ->label('Tipo de Saída')
+                            ->options([
+                                'venda' => 'Venda',
+                                'baixa' => 'Baixa',
+                                'outro' => 'Outro',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
+                        //dd($data);
+                         dd($record);
+                        if( $record->inventories()->exists() ){
+                            Inventory::updated(
+                                ['exit_date' => now(), 'exit_type' => $data['exit_type']]
+                            );
+                        }
+
+                        Notification::make()
+                            ->title('Saída registrada com sucesso!')
+                            ->success()
+                            ->send();
+
+
+                    })->requiresConfirmation(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
