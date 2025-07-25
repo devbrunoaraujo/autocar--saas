@@ -6,6 +6,7 @@ use App\Contracts\FipeServiceInterface;
 use App\Contracts\ImageProcessorInterface;
 use App\Filament\Resources\VehicleResource\Pages;
 use App\Models\Inventory;
+use App\Models\InventoryMovement;
 use App\Models\Vehicle;
 use App\Services\ImageUploadService;
 use Filament\Tables\Actions\Action;
@@ -455,7 +456,7 @@ class VehicleResource extends Resource
                     ->label('Adicionar ao Estoque')
                     ->icon('heroicon-o-plus-circle')
                     ->form([
-                        Forms\Components\Select::make('entry_type')
+                        Forms\Components\Select::make('origin')
                             ->label('Tipo de Entrada')
                             ->options([
                                 'compra' => 'Compra',
@@ -470,10 +471,19 @@ class VehicleResource extends Resource
                         }
                         Inventory::create([
                             'vehicle_id' => $record->id,
-                            'entry_date' => now(),
-                            'entry_type' => $data['entry_type'],
-                            'total_cost' => $record->purchase_price,
+                            'status' => true,
                         ]);
+
+                        InventoryMovement::create([
+                            'user_id' => auth()->id(),
+                            'vehicle_id' => $record->id,
+                            'movement_type' => 'entrada',
+                            'origin' => $data['origin'],
+                            'movement_date' => now(),
+                            'purchase_price' => $record->purchase_price,
+                            'description' => "Veículo {$record->model_name} adicionado ao estoque.",
+                        ]);
+
                         Notification::make()
                             ->title('Veículo adicionado ao estoque com sucesso!')
                             ->success()

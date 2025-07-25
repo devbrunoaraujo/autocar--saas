@@ -23,6 +23,8 @@ class InventoryResource extends Resource
     protected static ?string $navigationLabel = 'Estoque';
     protected static ?string $modelLabel = 'Movimentação de Estoque';
     protected static ?string $pluralModelLabel = 'Movimentações de Estoque';
+    protected static ?string $navigationGroup = 'Estoque';
+
 
     public static function form(Form $form): Form
     {

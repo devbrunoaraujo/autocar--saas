@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 class Vehicle extends Model
@@ -118,8 +119,13 @@ class Vehicle extends Model
         );
     }
 
-    public function inventories(): HasMany
+    public function inventories(): HasOne
     {
-        return $this->hasMany(Inventory::class);
+        return $this->hasOne(Inventory::class);
+    }
+
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
     }
 }

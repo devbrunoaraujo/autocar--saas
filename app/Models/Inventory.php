@@ -38,14 +38,12 @@ class Inventory extends Model
         return $entry->diffInDays($exit);
     }
 
+
+    //Relationships
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
     }
 
-    /**public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class);
-    }
-        **/
+
 }
