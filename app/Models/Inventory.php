@@ -5,25 +5,18 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inventory extends Model
 {
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'vehicle_id',
-        'entry_date',
-        'exit_date',
-        'entry_type',
-        'exit_type',
-        'supplier_id',
-        'total_cost',
+        'status'
     ];
-
-    protected $casts = [
-        'entry_date' => 'datetime',
-        'exit_date' => 'datetime',
-        'total_cost' => 'decimal:2',
-    ];
-
     /**
      * Calcula o número de dias que o veículo ficou/está no estoque.
      */

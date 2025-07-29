@@ -44,21 +44,22 @@ class InventoryMovementResource extends Resource
                     ->label('Veículo')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('movement_type')
-                    ->label('Tipo de Movimento')
+                Tables\Columns\TextColumn::make('entry_date')
+                    ->label('Data de Entrada')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('exit_date')
+                    ->label('Data de Saída')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('entry_type')
+                    ->label('Tipo de Entrada')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('origin')
-                    ->label('Origem'),
-                Tables\Columns\TextColumn::make('movement_date')
-                    ->label('Data do Movimento')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('purchase_price')
-                    ->label('Preço de Compra')
-                    ->money('BRL'),
-                Tables\Columns\TextColumn::make('description')
-                    ->label('Descrição')
-                    ->limit(50),
+                Tables\Columns\TextColumn::make('exit_type')
+                    ->label('Tipo de Saída')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
                 //

@@ -4,11 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
+use App\Models\InventoryMovement;
 use App\Models\Vehicle;
 use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Filament\Forms\FormsComponent;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -128,7 +130,7 @@ class InventoryResource extends Resource
                     ->label('Registrar Saída')
                     ->icon('heroicon-o-arrow-right')
                     ->form([
-                        Select::make('exit_type')
+                        Select::make('origin')
                             ->label('Tipo de Saída')
                             ->options([
                                 'venda' => 'Venda',
@@ -136,15 +138,29 @@ class InventoryResource extends Resource
                                 'outro' => 'Outro',
                             ])
                             ->required(),
+                        Forms\Components\TextInput::make('purchase_price')
+                            ->label('Preço de Compra')
+                            ->prefix('R$')
+                            ->numeric()
+                            ->required(),
+
                     ])
                     ->action(function ($record, array $data) {
                         //dd($data);
-                         dd($record);
-                        if( $record->inventories()->exists() ){
-                            Inventory::updated(
-                                ['exit_date' => now(), 'exit_type' => $data['exit_type']]
-                            );
-                        }
+                         //dd($record);
+
+                        InventoryMovement::create([
+                            'user_id' => auth()->id(),
+                            'vehicle_id' => $record->vehicle_id,
+                            'movement_type' => 'saída',
+                            'origin' => $data['origin'],
+                            'movement_date' => now(),
+                            'purchase_price' => $data['purchase_price' ?? 0],
+                            'description' => "Veículo {$record->vehicle->full_name} retirado do estoque.",
+                        ]);
+                        Inventory::find($record->id)?->delete();
+
+
 
                         Notification::make()
                             ->title('Saída registrada com sucesso!')
