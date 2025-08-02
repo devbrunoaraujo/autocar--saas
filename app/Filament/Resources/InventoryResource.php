@@ -23,9 +23,13 @@ class InventoryResource extends Resource
     protected static ?string $model = Inventory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+
     protected static ?string $navigationLabel = 'Estoque';
+
     protected static ?string $modelLabel = 'Estoque';
+
     protected static ?string $pluralModelLabel = 'Estoque';
+
     protected static ?string $navigationGroup = 'Estoque';
 
 
@@ -57,9 +61,6 @@ class InventoryResource extends Resource
                         0 => 'danger',
                         default => 'secondary',
                     }),
-
-
-
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('vehicle_id')
@@ -107,7 +108,6 @@ class InventoryResource extends Resource
                             ->prefix('R$')
                             ->numeric()
                             ->required(),
-
                     ])
                     ->action(function ($record, array $data) {
                         // Register the exit movement
