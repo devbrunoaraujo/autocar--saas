@@ -17,6 +17,7 @@ class Customer extends Model
         'country',
         'document',
         'document_type',
+        'birth_date',
         'is_active',
         'is_verified',
         'verified_at',
@@ -26,6 +27,7 @@ class Customer extends Model
         'is_active' => 'boolean',
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
+        'birth_date' => 'date',
     ];
 
     public function sales()

@@ -124,7 +124,7 @@ class InventoryResource extends Resource
 
                         Select::make('customer_id')
                             ->label('Cliente')
-                            ->options(fn () => Customer::all()->pluck('name', 'id'))
+                            ->options(fn () => Customer::where('is_active', 1)->pluck('name', 'id'))
                             ->searchable()
                             ->required(),
 

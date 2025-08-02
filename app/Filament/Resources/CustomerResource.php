@@ -90,7 +90,7 @@ class CustomerResource extends Resource
                         'CNPJ' => '00.000.000/0000-00',
                         default => 'Selecione o tipo de documento'
                     }),
-                DatePicker::make('date_of_birth')
+                DatePicker::make('birth_date')
                     ->label('Data de Nascimento')
                     ->required(),
                 Forms\Components\Toggle::make('is_active')
