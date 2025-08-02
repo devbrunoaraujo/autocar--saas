@@ -27,4 +27,9 @@ class Customer extends Model
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
     ];
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
 }

@@ -3,8 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventoryResource\Pages;
+use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\InventoryMovement;
+use App\Models\Sale;
 use App\Models\Vehicle;
 use Filament\Tables\Actions\Action;
 use Filament\Forms;
@@ -103,13 +105,45 @@ class InventoryResource extends Resource
                                 'outro' => 'Outro',
                             ])
                             ->required(),
-                        Forms\Components\TextInput::make('purchase_price')
-                            ->label('Preço de Compra')
+                        Forms\Components\TextInput::make('sale_price')
+                            ->label('Preço de Venda')
                             ->prefix('R$')
                             ->numeric()
                             ->required(),
+
+                        Select::make('payment_method')
+                            ->label('Método de Pagamento')
+                            ->options([
+                                'dinheiro' => 'Dinheiro',
+                                'cartao' => 'Cartão',
+                                'transferencia' => 'Transferência',
+                                'pix' => 'PIX',
+                            ])
+                            ->required()
+                            ->default('dinheiro'),
+
+                        Select::make('customer_id')
+                            ->label('Cliente')
+                            ->options(fn () => Customer::all()->pluck('name', 'id'))
+                            ->searchable()
+                            ->required(),
+
                     ])
                     ->action(function ($record, array $data) {
+
+                       // dd($data);
+                        //dd($record);
+
+                        //Register Sale
+                        Sale::create([
+                            'user_id' => auth()->id(),
+                            'vehicle_id' => $record->vehicle_id,
+                            'customer_id' => $data['customer_id'],
+                            'payment_method' => $data['payment_method'],
+                            'sale_date' => now(),
+                            'amount' => $data['sale_price'], // Assuming vehicle has a price attribute
+                        ]);
+
                         // Register the exit movement
                         InventoryMovement::create([
                             'user_id' => auth()->id(),
@@ -117,10 +151,13 @@ class InventoryResource extends Resource
                             'movement_type' => 'saída',
                             'origin' => $data['origin'],
                             'movement_date' => now(),
-                            'purchase_price' => $data['purchase_price' ?? 0],
+                            'purchase_price' => $record->vehicle->purchase_price,
+                            'sale_price' => $data['sale_price'],
                             'description' => "Veículo {$record->vehicle->full_name} retirado do estoque.",
                         ]);
+                        // Delete the inventory record
                         Inventory::find($record->id)?->delete();
+                        Vehicle::find($record->vehicle_id)?->delete();
                         Notification::make()
                             ->title('Saída registrada com sucesso!')
                             ->success()

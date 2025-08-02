@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vehicle extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'vehicle_type',
@@ -127,5 +129,10 @@ class Vehicle extends Model
     public function inventoryMovements(): HasMany
     {
         return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function sales(): HasOne
+    {
+        return $this->hasOne(Sale::class);
     }
 }

@@ -17,15 +17,17 @@ class InventoryMovement extends Model
         'movement_date',
         'purchase_price',
         'description',
+        'sale_price',
     ];
 
     protected $casts = [
         'movement_date' => 'datetime',
         'purchase_price' => 'float',
+        'sale_price' => 'float',
     ];
     public function vehicle(): BelongsTo
-    {
-        return $this->belongsTo(Vehicle::class);
+    { 
+        return $this->belongsTo(Vehicle::class)->withTrashed();
     }
 
     public function user(): BelongsTo

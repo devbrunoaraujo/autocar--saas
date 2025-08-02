@@ -35,7 +35,7 @@ class Inventory extends Model
     //Relationships
     public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(Vehicle::class)->withTrashed();
     }
 
 
