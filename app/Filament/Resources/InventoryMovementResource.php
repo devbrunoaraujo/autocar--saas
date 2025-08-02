@@ -18,7 +18,7 @@ class InventoryMovementResource extends Resource
 {
     protected static ?string $model = InventoryMovement::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
 
     protected static ?string $modelLabel = 'Movimentação de Estoque';
 

@@ -17,7 +17,7 @@ class OptionalResource extends Resource
 {
     protected static ?string $model = Optional::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-squares-plus';
 
     protected static ?string $modelLabel = 'Opcionais';
 
