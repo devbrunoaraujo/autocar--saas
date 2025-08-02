@@ -20,6 +20,10 @@ class InventoryMovementResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $modelLabel = 'Movimentação de Estoque';
+
+    protected static ?string $pluralModelLabel = 'Movimentações de Estoque';
+
     protected static ?string $navigationGroup = 'Estoque';
 
     protected static ?string $navigationLabel = 'Movimentações de Estoque';
@@ -44,32 +48,37 @@ class InventoryMovementResource extends Resource
                     ->label('Veículo')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('entry_date')
-                    ->label('Data de Entrada')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('movement_type')
+                    ->label('Tipo de Movimentação')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'entrada' => 'success',
+                        'saída' => 'danger',
+                        default => 'secondary',
+                    })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('exit_date')
-                    ->label('Data de Saída')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('origin')
+                    ->label('Tipo de Origem')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('entry_type')
-                    ->label('Tipo de Entrada')
+                Tables\Columns\TextColumn::make('movement_date')
+                    ->label('Data da Movimentação')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('exit_type')
-                    ->label('Tipo de Saída')
+                Tables\Columns\TextColumn::make('user.full_name')
+                    ->label('Usuário')
                     ->sortable()
                     ->searchable(),
             ])
             ->filters([
-                //
+
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+               // Tables\Actions\EditAction::make()
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                   // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -85,8 +94,13 @@ class InventoryMovementResource extends Resource
     {
         return [
             'index' => Pages\ListInventoryMovements::route('/'),
-            'create' => Pages\CreateInventoryMovement::route('/create'),
-            'edit' => Pages\EditInventoryMovement::route('/{record}/edit'),
+            //'create' => Pages\CreateInventoryMovement::route('/create'),
+            //'edit' => Pages\EditInventoryMovement::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }
